@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project name="hive_geolocation_udf" default="jar" basedir=".">
+    <target name="init">
+
+        <property name="src.dir" value="java/src" />
+        <property name="build.dir" value="java/build" />
+        <property name="dist.dir" value="." />
+
+        <property name="jar.file" value="geolocation_udf.jar" />
+
+        <fileset id="hadoopcore" dir="/usr/lib/hadoop/">
+            <include name="*.jar"/>
+            <include name="lib/*.jar"/>
+        </fileset>
+        <fileset id="hive" dir="/usr/lib/hive">
+            <include name="lib/*.jar"/>
+        </fileset>
+    </target>
+
+    <target name="clean" depends="init">
+        <delete failonerror="false" dir="${build.dir}"/>
+        <delete failonerror="false" file="${jar.file}"/>
+    </target>
+
+    <target name="compile" depends="clean">
+        <mkdir dir="${build.dir}"/>
+
+        <javac srcdir="${src.dir}" destdir="${build.dir}">
+            <classpath>
+                <fileset refid="hadoopcore"/>
+                <fileset refid="hive"/>
+            </classpath>
+        </javac>
+    </target>
+
+    <target name="jar" depends="compile">
+
+        <jar destfile="${dist.dir}/${jar.file}">
+            <fileset dir="${build.dir}" />
+        </jar>
+    </target>
+
+</project>
