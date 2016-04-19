@@ -13,7 +13,7 @@ tablets = FILTER details BY prod_id == 1274348;
 
 
 -- TODO (A): Join the two relations on the order_id field
-joined = JOIN recent by order_id,tablets by order_id;
+joined = JOIN recent by order_id,tablets by order_id
 
 -- TODO (B): Create a new relation containing just the month
 new_rel = FOREACH joined GENERATE SUBSTRING(order_dtm,0,7) as month;
