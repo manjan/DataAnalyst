@@ -18,7 +18,7 @@ recent1 = FOREACH tablets GENERATE recent::order_id as order_id;
 
 -- TODO (C): Get the details for each of those orders
 joined = JOIN recent1 by order_id,details by order_id;
-new_data = FOREACH joined GENERATE recent1::order_id as order_id, details::prod_id as prod_id;
+new_data = FOREACH joined GENERATE recent::order_id as order_id, tablets::prod_id as prod_id;
 --DESCRIBE joined;
 
 -- TODO (D): Count the number of items in each order
