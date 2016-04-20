@@ -48,20 +48,3 @@ PARTITION(network=2);
 
 SELECT COUNT(*) from ads where network=1;
 SELECT COUNT(*) from ads where network=2;
-
-Relational Analysis
-
-Select COUNT(*) as totals,prod_id
-from order_details
-GROUP BY prod_id
-ORDER BY totals DESC
-LIMIT 5;
-
-Select SUM(p.price) as totals,o.order_id as orderid
-from order_details o, products p
-WHERE o.prod_id = p.prod_id
-GROUP BY orderid
-ORDER BY totals DESC
-LIMIT 5;
-
-
