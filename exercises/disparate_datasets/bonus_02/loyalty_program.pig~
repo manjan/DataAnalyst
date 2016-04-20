@@ -29,7 +29,7 @@ product_rel = FOREACH products_join GENERATE cust_rel.cust_id, cust_rel.order_id
 final_join = JOIN product_rel by prod_id, products by prod_id;
 f_rel = FOREACH final_join GENERATE product_rel.prod_id,products.price,product_rel.cust_id;
 
-final_group = GROUP f_rel BY f_rel.cust_id;
+final_group = GROUP f_rel BY f_rel::cust_id;
 final_rel = FOREACH final_group GENERATE group, (INT)SUM(f_rel.price) as totals;
 
 /*

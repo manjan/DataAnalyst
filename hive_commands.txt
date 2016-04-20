@@ -1,0 +1,50 @@
+CREATE EXTERNAL TABLE employees
+(emp_id STRING,
+ fname STRING,
+ lname STRING,
+ address STRING,
+ city STRING,
+ state STRING,
+ zipcode STRING,
+ job_title STRING,
+ email STRING,
+ active STRING,
+ salary STRING)
+ ROW FORMAT DELIMITED
+ FIELDS TERMINATED BY '\t'
+ LOCATION '/dualcore/employees';
+
+
+
+ALTER TABLE suppliers CHANGE company name STRING;
+
+ALTER TABLE suppliers RENAME TO vendors;
+
+
+CREATE TABLE ads
+(
+  cust_id int,
+  fname string,
+  lname string,
+  address string,
+  city string,
+  state string,
+  zipcode string
+)
+PARTITIONED BY (network TINYINT)
+ROW FORMAT DELIMITED
+FIELDS TERMINATED BY '\t';
+
+ALTER TABLE ads ADD PARTITION(network=1);
+ALTER TABLE ads ADD PARTITION(network=2);
+
+LOAD DATA INPATH '/dualcore/ad_data1/part-m-00000'
+INTO TABLE ads
+PARTITION(network=1);
+
+LOAD DATA INPATH '/dualcore/ad_data2/part-r-00000'
+INTO TABLE ads
+PARTITION(network=2);
+
+SELECT COUNT(*) from ads where network=1;
+SELECT COUNT(*) from ads where network=2;
