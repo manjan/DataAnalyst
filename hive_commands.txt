@@ -104,3 +104,83 @@ WHERE (p.prod_id = o.prod_id and o.order_id = od.order_id)
 GROUP BY dater
 ) ads
 ORDER BY dater;
+
+
+
+#Hands-On Exercise: Analyzing Text andComplex Data With Hive
+
+Step #1: Create, Load and Query a Table with Complex Data
+CREATE EXTERNAL TABLE loyalty_program
+(
+  cust_id STRING,
+  fname STRING,
+  lname STRING,
+  email STRING,
+  level STRING,
+  phone MAP<STRING,STRING>,
+  order_ids ARRAY<INT>,
+  order_value STRUCT<min:INT,max:INT,avg:INT,total:INT>
+  )
+ ROW FORMAT DELIMITED
+ FIELDS TERMINATED BY '|'
+ COLLECTION ITEMS TERMINATED BY ','
+ MAP KEYS TERMINATED BY ':'
+ LOCATION '/dualcore/loyalty_program';
+ 
+ hdfs dfs -put /home/training/training_materials/analyst/data/loyalty_data.txt /dualcore/loyalty_program/
+
+SELECT phone['HOME'] as homephone from loyalty_program where cust_id=1200866;
+
+SELECT order_ids[2] as order_id from loyalty_program where cust_id=1200866;
+
+SELECT order_value.total as total from loyalty_program where cust_id=1200866;
+
+
+
+Step #2: Create and Populate the Web Logs Table
+
+-- The following is an example of what a line from a Web server log file looks like
+-- 
+-- 10.21.147.9 - - [31/May/2013:00:00:04 -0800] "GET /tablet.html HTTP/1.1" 200 9652 "http://www.google.com/search?q=tablet" "ACME Browser 1.0" "SESSIONID=280493516274"
+
+
+CREATE EXTERNAL TABLE web_logs (
+  ip_address STRING,
+  date_string STRING,
+  request STRING,
+  status STRING,
+  bytes STRING,
+  referer STRING,
+  user_agent STRING,
+  cookie STRING
+)
+ROW FORMAT SERDE 'org.apache.hadoop.hive.serde2.RegexSerDe'
+WITH SERDEPROPERTIES (
+   "input.regex" = "^([\\d.]+) \\S+ \\S+ \\[(.+?)\\] \\\"(.+?)\\\" (\\d{3}) (\\d+) \\\"(.+?)\\\" \\\"(.+?)\\\" \\\"SESSIONID=(\\d+)\\\"\\s*"
+)
+LOCATION '/dualcore/web_logs';
+
+hcat -f $ADIR/exercises/complex_data/create_web_logs.hql
+
+hdfs dfs -put $ADIR/data/access.log /dualcore/web_logs/
+
+SELECT term, COUNT(term) AS num FROM
+(SELECT LOWER(REGEXP_EXTRACT(request,
+'/search\\?phrase=(\\S+)', 1)) AS term
+FROM web_logs
+WHERE request REGEXP '/search\\?phrase=') terms
+GROUP BY term
+ORDER BY num DESC
+LIMIT 3;
+
+Bonus Exercise #1: Analyze Numeric Product Ratings
+
+#find the product with the highest average among all those with at least 50 ratings:
+SELECT prod_id, FORMAT_NUMBER(avg_rating, 2) AS avg_rating
+ FROM (SELECT prod_id, AVG(rating) AS avg_rating,
+                           COUNT(*) AS num
+                           FROM ratings
+                           GROUP BY prod_id) rated
+WHERE num >=50
+ORDER BY avg_rating DESC
+LIMIT 1;
