@@ -64,4 +64,43 @@ GROUP BY orderid
 ORDER BY totals DESC
 LIMIT 5;
 
+Relational Analysis
+1.
+INVALIDATE METADATA;
+SELECT p.name,COUNT(*) as count
+from orders p, order_details o
+WHERE (p.prod_id = o.prod_id)
+GROUP BY p.name
+ORDER BY count DESC
+LIMIT 3;
 
+
+2.
+INVALIDATE METADATA;
+SELECT o.order_id,SUM(p.cost) as total
+from products p, order_details o
+WHERE (p.prod_id = o.prod_id)
+GROUP BY o.order_id
+ORDER BY total DESC
+LIMIT 3;
+
+3.
+INVALIDATE METADATA;
+SELECT TO_DATE(od.order_date) as dater, SUM(p.price) as revenue,SUM(p.price - p.cost) as profit
+from products p, order_details o, orders od
+WHERE (p.prod_id = o.prod_id and o.order_id = od.order_id)
+GROUP BY dater
+ORDER BY dater;
+
+
+BONUS:
+INVALIDATE METADATA;
+SELECT dater, revenue, profit,
+RANK() OVER 
+(PARTITION BY YEAR(dater),MONTH(dater) ORDER BY profit DESC) as ranks
+from 
+(SELECT TO_DATE(od.order_date) as dater, SUM(p.price) as revenue,SUM(p.price - p.cost) as profit from products p, order_details o, orders od
+WHERE (p.prod_id = o.prod_id and o.order_id = od.order_id)
+GROUP BY dater
+) ads
+ORDER BY dater;
