@@ -1,4 +1,4 @@
--- group_data.pig
+-- group_data_multiple_key.pig
 data = load 'NYSE_daily' as (exchange, stock,date,dividends);
 grpd = group data by (exchange, stock);
 avg = foreach grpd generate group, AVG(data.dividends);
