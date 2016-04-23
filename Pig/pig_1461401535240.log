@@ -1,8 +1,8 @@
 Error before Pig is launched
 ----------------------------
-ERROR 2997: Encountered IOException. File joined.p does not exist.
+ERROR 2997: Encountered IOException. File Dufd.import.list=org.apache.pig.piggybank.evaluation.string does not exist.
 
-java.io.FileNotFoundException: File joined.p does not exist.
+java.io.FileNotFoundException: File Dufd.import.list=org.apache.pig.piggybank.evaluation.string does not exist.
 	at org.apache.hadoop.fs.RawLocalFileSystem.getFileStatus(RawLocalFileSystem.java:397)
 	at org.apache.hadoop.fs.FilterFileSystem.getFileStatus(FilterFileSystem.java:251)
 	at org.apache.pig.impl.io.FileLocalizer.fetchFilesInternal(FileLocalizer.java:818)
